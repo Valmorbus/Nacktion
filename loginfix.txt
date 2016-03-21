@@ -1,29 +1,21 @@
-Replace old login second part with: 
-
- public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
-        private final String mEmail;
-        private final String mPassword;
-
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-
-            RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
+           RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
             String url = "http://nackademiska.azurewebsites.net/4/login";
+
             StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             // response
                             Log.d("Response", response);
-                            //onPostExecute(true);
                             finish();
                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            try {
+                                JSONObject custId = new JSONObject(response);
+                                i.putExtra("customerid", custId.getInt("Id"));
+                                Log.d("jsontest", String.valueOf(custId.getInt("Id")));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             startActivity(i);
                         }
                     },
@@ -76,6 +68,3 @@ Replace old login second part with:
             showProgress(false);
         }
     }
-
-
-}
