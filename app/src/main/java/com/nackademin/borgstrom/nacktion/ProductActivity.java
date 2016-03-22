@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -19,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
@@ -35,6 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +59,7 @@ public class ProductActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab2 = (FloatingActionButton) findViewById(R.id.fab2);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -80,15 +85,35 @@ public class ProductActivity extends AppCompatActivity
         TextView tPrice = (TextView) findViewById(R.id.productPrice);
         tName.setText(name);
         tDescription.setText(description);
-        tTime.setText("sluttid: " + time);
-        tPrice.setText(pris + "kr");
+        tTime.setText("Sluttid: " + time);
+        tPrice.setText("Acceptpris: " +pris + "kr");
+
+        try {
+            InputStream imageStream = getAssets().open("noimage.png");
+            Drawable d = Drawable.createFromStream(imageStream, null);
+
+            ImageView iv = (ImageView) findViewById(R.id.productImage);
+            iv.setImageDrawable(d);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 
         assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                test(name, auktionId, Double.parseDouble(pris));
+                chooseBid(name, auktionId, Double.parseDouble(pris));
+
+            }
+        });
+        assert fab2 != null;
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int fullprice = (int) Math.round( Double.parseDouble(pris));
+                placeBid(auktionId,  fullprice);
 
             }
         });
@@ -150,7 +175,7 @@ public class ProductActivity extends AppCompatActivity
             sendMail.setType("text/mail");
             sendMail.putExtra(Intent.EXTRA_EMAIL, new String[]{"borgstrom.simon@gmail.com"});
             sendMail.putExtra(Intent.EXTRA_SUBJECT, "Gällane Auktion " +emailSubject);
-            sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Simon");
+            sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Nacktion");
             startActivity(Intent.createChooser(sendMail, "Välj epostprogram:"));
         } else if (id == R.id.nav_send) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nacktion.azurewebsites.net"));
@@ -178,7 +203,6 @@ public class ProductActivity extends AppCompatActivity
                         // response
                         Log.d("Response", response);
                         sentDialog("Bud lagt", "Ditt bud är registrerat");
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -203,7 +227,7 @@ public class ProductActivity extends AppCompatActivity
 
     }
 
-    private void test(String namn, int auktion, double pris) {
+    private void chooseBid(String namn, int auktion, double pris) {
         final int auktionid = auktion;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -220,7 +244,7 @@ public class ProductActivity extends AppCompatActivity
                 Gravity.CENTER));
         builder.setView(parent);
 
-        builder.setPositiveButton("Köp", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Lägg bud", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 placeBid(auktionid, picker.getValue());
                 Log.d("pos", "ok");
