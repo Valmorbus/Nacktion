@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,6 +38,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -44,7 +46,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -325,67 +329,69 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-            String url = "http://nackademiska.azurewebsites.net/4/login";
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("Email", mEmail);
-                obj.put("Password", mPassword);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
             RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
-            JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST,url,obj,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
+            String url = "http://nackademiska.azurewebsites.net/4/login";
 
-                            successTest = true;
+            StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            // response
+                            Log.d("Response", response);
+                            finish();
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            try {
+                                JSONObject custId = new JSONObject(response);
+                                i.putExtra("customerid", custId.getInt("Id"));
+                                Log.d("jsontest", String.valueOf(custId.getInt("Id")));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            startActivity(i);
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            successTest = false;
+                            Log.d("Error.Response", error.toString());
+                            mAuthTask = null;
+                            showProgress(false);
+                            mPasswordView.setError(getString(R.string.error_incorrect_password));
+                            mPasswordView.requestFocus();
+
                         }
-                    });
-            queue.add(jsObjRequest);
-
-
-
-
-
-           /* for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("email", mEmail);
+                    params.put("password", mPassword);
+                    return params;
                 }
+            };
+            queue.add(postRequest);
 
-            }*/
-return successTest;
+
+            return false;
             // TODO: register the new account here.
-           // return false;
+
         }
 
-        @Override
+      /*  @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
 
             if (success) {
-                Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(i);
+
             } else {
+                mAuthTask = null;
+                showProgress(false);
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }
-        }
+        }*/
 
         @Override
         protected void onCancelled() {
@@ -393,7 +399,6 @@ return successTest;
             showProgress(false);
         }
     }
-
 
 
 }

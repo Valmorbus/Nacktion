@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -31,13 +32,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class CategoryActivity extends AppCompatActivity
+public class CategoryProductActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_category);
+        setContentView(R.layout.activity_category_product);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -51,56 +52,62 @@ public class CategoryActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        final ArrayList<Product> categoryList = new ArrayList<Product>();
-    RequestQueue queue = Volley.newRequestQueue(this);
-    String url = "http://nackademiska.azurewebsites.net/4/getcategories";
-    JsonArrayRequest jsObjRequest = new JsonArrayRequest
-            (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+        final int auktionId = getIntent().getIntExtra("categoryid", 0);
+        final String name = getIntent().getStringExtra("categoryname");
 
-                @Override
-                public void onResponse(JSONArray response) {
-                    try {
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject json = response.getJSONObject(i);
-                            categoryList.add(new Product(json.getInt("Id"), json.getString("Name")));
-                        }
+        TextView tName = (TextView) findViewById(R.id.categoryTextView);
+        tName.setText(name);
 
+        final ArrayList<Product> productList = new ArrayList<Product>();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://nackademiska.azurewebsites.net/4/getongoingauctions?categoryid="+auktionId;
+        JsonArrayRequest jsObjRequest = new JsonArrayRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
 
-                        ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(CategoryActivity.this,
-                                android.R.layout.simple_list_item_1, android.R.id.text1, categoryList);
-                        ListView lv = (ListView) findViewById(R.id.listView2);
-
-                        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                Intent i = new Intent(CategoryActivity.this, CategoryProductActivity.class);
-                                i.putExtra("categoryid", categoryList.get(position).getId());
-                                i.putExtra("categoryname", categoryList.get(position).getName());
-                                startActivity(i);
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject json = response.getJSONObject(i);
+                                productList.add(new Product(json.getInt("Id"), json.getString("Name"), json.getString("Description"),
+                                        json.getString("AcceptPrice"), json.getString("EndTime")));
                             }
-                        });
+                            ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(CategoryProductActivity.this,
+                                    android.R.layout.simple_list_item_1, android.R.id.text1, productList);
+                            ListView lv = (ListView) findViewById(R.id.listView3);
+                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    Intent i = new Intent(CategoryProductActivity.this, ProductActivity.class);
+                                    i.putExtra("productid", productList.get(position).getId());
+                                    i.putExtra("produktnamn", productList.get(position).getName());
+                                    i.putExtra("productdescription", productList.get(position).getDescription());
+                                    i.putExtra("produktpris", productList.get(position).getAcceptpris());
+                                    i.putExtra("productsluttid", productList.get(position).getSlutTid());
+                                    startActivity(i);
+                                }
+                            });
 
 
-                        lv.setAdapter(arrayAdapter);
+                            lv.setAdapter(arrayAdapter);
 
-                    } catch (JSONException e) {
+                        } catch (JSONException e) {
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
 
                     }
-                }
-            }, new Response.ErrorListener() {
+                });
 
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // TODO Auto-generated method stub
-
-                }
-            });
-
-    queue.add(jsObjRequest);
-}
+        queue.add(jsObjRequest);
 
 
-
+    }
 
     @Override
     public void onBackPressed() {
@@ -115,7 +122,7 @@ public class CategoryActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.category, menu);
+        getMenuInflater().inflate(R.menu.category_product, menu);
         return true;
     }
 
@@ -144,7 +151,8 @@ public class CategoryActivity extends AppCompatActivity
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_gallery) {
-
+            Intent i = new Intent(this, CategoryActivity.class);
+            startActivity(i);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -162,6 +170,7 @@ public class CategoryActivity extends AppCompatActivity
             startActivity(browserIntent);
 
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

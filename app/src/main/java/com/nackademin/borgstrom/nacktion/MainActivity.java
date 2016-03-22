@@ -33,6 +33,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    protected static int id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        id = getIntent().getIntExtra("customerid",0);
 
         final ArrayList<Product> productlist = new ArrayList<Product>();
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -154,12 +158,12 @@ public class MainActivity extends AppCompatActivity
             Intent sendMail = new Intent(Intent.ACTION_SEND);
             sendMail.setType("text/mail");
             sendMail.putExtra(Intent.EXTRA_EMAIL, new String[] {"borgstrom.simon@gmail.com"});
-            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Mitt subject");
-            sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Simon");
+            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Till Nacktion");
+            sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Nacktion");
             startActivity(Intent.createChooser(sendMail,"Välj epostprogram:"));
 
         } else if (id == R.id.nav_send) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.github.com/Valmorbus"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nacktion.azurewebsites.net"));
             startActivity(browserIntent);
         }
 

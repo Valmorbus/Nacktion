@@ -17,7 +17,6 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,11 +27,14 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
-           <!-- <intent-filter>
+
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
         </activity>
         <activity
             android:name=".ProductActivity"
@@ -60,6 +62,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nackademin.borgstrom.nacktion.MainActivity" />
+        </activity>
+        <activity
+            android:name=".CategoryProductActivity"
+            android:label="@string/title_activity_category_product"
+            android:parentActivityName=".CategoryActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nackademin.borgstrom.nacktion.CategoryActivity" />
         </activity>
     </application>
 
