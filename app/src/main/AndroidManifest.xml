@@ -72,6 +72,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nackademin.borgstrom.nacktion.CategoryActivity" />
         </activity>
+        <activity
+            android:name=".LeverantorerActivity"
+            android:label="@string/title_activity_leverantorer"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nackademin.borgstrom.nacktion.MainActivity" />
+        </activity>
+        <activity
+            android:name=".LeverantorAboutActivity"
+            android:label="@string/title_activity_leverantor_about"
+            android:parentActivityName=".LeverantorerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nackademin.borgstrom.nacktion.LeverantorerActivity" />
+        </activity>
     </application>
 
 </manifest>

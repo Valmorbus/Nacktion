@@ -25,5 +25,8 @@
     <string name="title_activity_category">Kategori</string>
     <string name="aboutUsText">Vi på Nacktion består av en grupp på sex personer som har fått uppdraget att ta fram denna applikation för de kunder som använder sig av företaget Nackademiska Auktionsfrämjandet och dess tjänst inom auktioner. År 2016-03-21 startades denna grupp även kallad \"Let\'s go with orange and blue\" group som planerar att inte behöva jobba tillsammans i mer än tre hela dagar för att vi vill göra annat helt enkelt. Du kan besöka vår egen hemsida på www.orangeHeartBlue.com.</string>
     <string name="aboutUsHeader">Om oss</string>
-    <string name="title_activity_category_product">CategoryProductActivity</string>
+    <string name="title_activity_category_product">Produkter</string>
+    <string name="title_activity_leverantorer">Våra leverantörer</string>
+    <string name="title_activity_leverantor_about">Våra leverantörer</string>
+
 </resources>

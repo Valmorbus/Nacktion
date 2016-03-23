@@ -1,10 +1,10 @@
 package com.nackademin.borgstrom.nacktion;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Base64;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -67,15 +66,24 @@ public class CategoryProductActivity extends AppCompatActivity
 
                     @Override
                     public void onResponse(JSONArray response) {
+                        ArrayList<Bitmap> bitmaps = new ArrayList<>();
                         try {
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject json = response.getJSONObject(i);
                                 productList.add(new Product(json.getInt("Id"), json.getString("Name"), json.getString("Description"),
                                         json.getString("AcceptPrice"), json.getString("EndTime"), json.getString("Image")));
-                            }
-                            ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(CategoryProductActivity.this,
+
+                            byte[] base64String;
+                            base64String = Base64.decode(productList.get(i).getImage(), Base64.DEFAULT);
+                            Bitmap bitMap = BitmapFactory.decodeByteArray(base64String, 0, base64String.length);
+                            bitmaps.add(bitMap);
+                        }
+                        ListView lv=(ListView) findViewById(R.id.listView3);
+                        lv.setAdapter(new CustomAdapter(CategoryProductActivity.this, productList, bitmaps));
+
+                            /*ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(CategoryProductActivity.this,
                                     android.R.layout.simple_list_item_1, android.R.id.text1, productList);
-                            ListView lv = (ListView) findViewById(R.id.listView3);
+                            ListView lv = (ListView) findViewById(R.id.listView3);*/
                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -97,7 +105,7 @@ public class CategoryProductActivity extends AppCompatActivity
                             });
 
 
-                            lv.setAdapter(arrayAdapter);
+                           /* lv.setAdapter(arrayAdapter);*/
 
                         } catch (JSONException e) {
 
@@ -155,15 +163,16 @@ public class CategoryProductActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_start) {
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_category) {
             Intent i = new Intent(this, CategoryActivity.class);
             startActivity(i);
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_supplier) {
+            Intent i = new Intent(this, LeverantorerActivity.class);
+            startActivity(i);
+        } else if (id == R.id.nav_about) {
             Intent i = new Intent(this, AboutActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_email) {

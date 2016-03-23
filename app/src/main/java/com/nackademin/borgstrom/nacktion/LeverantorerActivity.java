@@ -1,22 +1,19 @@
 package com.nackademin.borgstrom.nacktion;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -32,17 +29,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity
+public class LeverantorerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
-    protected static int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_leverantorer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -53,60 +50,37 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        id = getIntent().getIntExtra("customerid",0);
-
-        final ArrayList<Product> productlist = new ArrayList<Product>();
+        final ArrayList<Leverantor> leverantorList = new ArrayList<Leverantor>();
         RequestQueue queue = Volley.newRequestQueue(this);
-
-        String url = "http://nackademiska.azurewebsites.net/4/getongoingauctions";
+        String url = "http://nackademiska.azurewebsites.net/4/getsuppliers";
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
 
                     @Override
                     public void onResponse(JSONArray response) {
                         try {
-                            ArrayList<Bitmap> bitmaps = new ArrayList<>();
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject json = response.getJSONObject(i);
-                                productlist.add(new Product(json.getInt("Id"), json.getString("Name"), json.getString("Description"),
-                                        json.getString("AcceptPrice"), json.getString("EndTime"), json.getString("Image")));
-
-
-                                byte[] base64String;
-                                base64String = Base64.decode(productlist.get(i).getImage(), Base64.DEFAULT);
-                                Bitmap bitMap = BitmapFactory.decodeByteArray(base64String, 0, base64String.length);
-                                bitmaps.add(bitMap);
+                                leverantorList.add(new Leverantor(json.getInt("Id"), json.getString("Name")));
                             }
-                            ListView lv=(ListView) findViewById(R.id.listView);
-                            lv.setAdapter(new CustomAdapter(MainActivity.this, productlist, bitmaps));
-/*
-                            ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(MainActivity.this,
-                                    android.R.layout.simple_list_item_1, android.R.id.text1, productlist);
-                            ListView lv = (ListView) findViewById(R.id.listView);
-*/
+
+
+                            ArrayAdapter<Leverantor> arrayAdapter = new ArrayAdapter<Leverantor>(LeverantorerActivity.this,
+                                    android.R.layout.simple_list_item_1, android.R.id.text1, leverantorList);
+                            ListView lv = (ListView) findViewById(R.id.listView4);
+
                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    Intent i = new Intent(MainActivity.this, ProductActivity.class);
-                                    i.putExtra("productid", productlist.get(position).getId());
-                                    i.putExtra("produktnamn", productlist.get(position).getName());
-                                    i.putExtra("productdescription", productlist.get(position).getDescription());
-                                    i.putExtra("produktpris", productlist.get(position).getAcceptpris());
-                                    i.putExtra("productsluttid", productlist.get(position).getSlutTid());
-                                    Log.i("image", productlist.get(position).getImage());
-                                    Log.i("image", String.valueOf(productlist.get(position).getId()) );
-                                    Log.i("image",productlist.get(position).getName());
-
-                                    byte[] base64String;
-                                    base64String = Base64.decode(productlist.get(position).getImage(), Base64.DEFAULT);
-
-                                    i.putExtra("productimage", base64String);
+                                    Intent i = new Intent(LeverantorerActivity.this, LeverantorAboutActivity.class);
+                                    i.putExtra("leverantorid", leverantorList.get(position).getId());
+                                    i.putExtra("leverantornamn", leverantorList.get(position).getName());
                                     startActivity(i);
                                 }
                             });
 
 
-                       /*     lv.setAdapter(arrayAdapter);*/
+                            lv.setAdapter(arrayAdapter);
 
                         } catch (JSONException e) {
 
@@ -122,6 +96,8 @@ public class MainActivity extends AppCompatActivity
                 });
 
         queue.add(jsObjRequest);
+
+
     }
 
     @Override
@@ -137,7 +113,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.leverantorer, menu);
         return true;
     }
 
@@ -150,7 +126,6 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-
             return true;
         }
 
@@ -164,27 +139,27 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_start) {
-            // Handle the camera action
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
         } else if (id == R.id.nav_category) {
             Intent i = new Intent(this, CategoryActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_supplier) {
-            Intent i = new Intent(this, LeverantorerActivity.class);
-            startActivity(i);
+
         } else if (id == R.id.nav_about) {
             Intent i = new Intent(this, AboutActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_email) {
             Intent sendMail = new Intent(Intent.ACTION_SEND);
             sendMail.setType("text/mail");
-            sendMail.putExtra(Intent.EXTRA_EMAIL, new String[] {"borgstrom.simon@gmail.com"});
-            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Till Nacktion");
+            sendMail.putExtra(Intent.EXTRA_EMAIL, new String[]{"borgstrom.simon@gmail.com"});
+            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Till Naktion");
             sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Nacktion");
-            startActivity(Intent.createChooser(sendMail,"Välj epostprogram:"));
-
+            startActivity(Intent.createChooser(sendMail, "Välj epostprogram:"));
         } else if (id == R.id.nav_send) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nacktion.azurewebsites.net"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nauktion.azurewebsites.net"));
             startActivity(browserIntent);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -1,9 +1,11 @@
 package com.nackademin.borgstrom.nacktion;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,21 +14,35 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
+import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
-public class AboutActivity extends AppCompatActivity
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+public class LeverantorAboutActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
+        setContentView(R.layout.activity_leverantor_about);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -37,17 +53,44 @@ public class AboutActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        final int supid = getIntent().getIntExtra("leverantorid", 0);
+        final String supName = getIntent().getStringExtra("leverantornamn");
 
-        try {
-            InputStream imageStream = getAssets().open("club.jpg");
-            Drawable d = Drawable.createFromStream(imageStream, null);
+        TextView header = (TextView) findViewById(R.id.leverantorHeader);
+        header.setText(supName);
 
-            ImageView iv = (ImageView) findViewById(R.id.imageView3);
-            iv.setImageDrawable(d);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final ArrayList<Leverantor> leverantorList = new ArrayList<Leverantor>();
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://nackademiska.azurewebsites.net/4/getsupplierdetails?supplierid="+supid;
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            TextView tv = (TextView) findViewById(R.id.leverantorAboutText);
+                            tv.setText("Adress" +"\n"+response.getString("Address") + "\n"+
+                                    response.getString("PostalCode") + " " +response.getString("City")+"\n"+
+                                    "telefon\n" +
+                            response.getString("Phone") +"\n"+
+                                    "Epost\n"+
+                            response.getString("Email"));
+
+                        } catch (JSONException e) {
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+
+        queue.add(jsObjRequest);
 
     }
 
@@ -64,7 +107,7 @@ public class AboutActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.about, menu);
+        getMenuInflater().inflate(R.menu.leverantor_about, menu);
         return true;
     }
 
@@ -99,18 +142,19 @@ public class AboutActivity extends AppCompatActivity
             Intent i = new Intent(this, LeverantorerActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_about) {
-
+            Intent i = new Intent(this, AboutActivity.class);
+            startActivity(i);
         } else if (id == R.id.nav_email) {
             Intent sendMail = new Intent(Intent.ACTION_SEND);
             sendMail.setType("text/mail");
-            sendMail.putExtra(Intent.EXTRA_EMAIL, new String[] {"borgstrom.simon@gmail.com"});
-            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Till Nacktion");
+            sendMail.putExtra(Intent.EXTRA_EMAIL, new String[]{"borgstrom.simon@gmail.com"});
+            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Gällane Leverantörer");
             sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Nacktion");
-            startActivity(Intent.createChooser(sendMail,"Välj epostprogram:"));
-
+            startActivity(Intent.createChooser(sendMail, "Välj epostprogram:"));
         } else if (id == R.id.nav_send) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nacktion.azurewebsites.net"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nauktion.azurewebsites.net"));
             startActivity(browserIntent);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

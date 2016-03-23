@@ -3,19 +3,19 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/nav_start"
             android:icon="@drawable/ic_menu_bid"
             android:title="Pågående" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_category"
             android:icon="@drawable/ic_menu_category"
             android:title="Kategori" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="temp" />
+            android:id="@+id/nav_supplier"
+            android:icon="@drawable/ic_menu_deliver"
+            android:title="Leverantörer" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_about"
             android:icon="@drawable/ic_menu_about"
             android:title="Om" />
     </group>
