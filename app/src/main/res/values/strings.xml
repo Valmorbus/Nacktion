@@ -28,5 +28,6 @@
     <string name="title_activity_category_product">Produkter</string>
     <string name="title_activity_leverantorer">Våra leverantörer</string>
     <string name="title_activity_leverantor_about">Våra leverantörer</string>
+    <string name="leverantorerHeader">Våra leverantörer</string>
 
 </resources>
