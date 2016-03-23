@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity
 
         final ArrayList<Product> productlist = new ArrayList<Product>();
         RequestQueue queue = Volley.newRequestQueue(this);
+
         String url = "http://nackademiska.azurewebsites.net/4/getongoingauctions";
         JsonArrayRequest jsObjRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {

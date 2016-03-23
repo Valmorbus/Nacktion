@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Base64;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -70,7 +71,7 @@ public class CategoryProductActivity extends AppCompatActivity
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject json = response.getJSONObject(i);
                                 productList.add(new Product(json.getInt("Id"), json.getString("Name"), json.getString("Description"),
-                                        json.getString("AcceptPrice"), json.getString("EndTime")));
+                                        json.getString("AcceptPrice"), json.getString("EndTime"), json.getString("Image")));
                             }
                             ArrayAdapter<Product> arrayAdapter = new ArrayAdapter<Product>(CategoryProductActivity.this,
                                     android.R.layout.simple_list_item_1, android.R.id.text1, productList);
@@ -84,6 +85,13 @@ public class CategoryProductActivity extends AppCompatActivity
                                     i.putExtra("productdescription", productList.get(position).getDescription());
                                     i.putExtra("produktpris", productList.get(position).getAcceptpris());
                                     i.putExtra("productsluttid", productList.get(position).getSlutTid());
+
+                                    byte[] base64String;
+                                    base64String = Base64.decode(productList.get(position).getImage(), Base64.DEFAULT);
+
+                                    i.putExtra("productimage", base64String);
+                                    startActivity(i);
+
                                     startActivity(i);
                                 }
                             });
