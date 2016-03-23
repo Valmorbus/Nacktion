@@ -9,7 +9,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.EventLogTags;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject json = response.getJSONObject(i);
                                 productlist.add(new Product(json.getInt("Id"), json.getString("Name"), json.getString("Description"),
-                                        json.getString("AcceptPrice"), json.getString("EndTime")));
+                                        json.getString("AcceptPrice"), json.getString("EndTime"), json.getString("Image")));
                             }
 
 
@@ -82,6 +83,14 @@ public class MainActivity extends AppCompatActivity
                                     i.putExtra("productdescription", productlist.get(position).getDescription());
                                     i.putExtra("produktpris", productlist.get(position).getAcceptpris());
                                     i.putExtra("productsluttid", productlist.get(position).getSlutTid());
+                                    Log.i("image", productlist.get(position).getImage());
+                                    Log.i("image", String.valueOf(productlist.get(position).getId()) );
+                                    Log.i("image",productlist.get(position).getName());
+
+                                    byte[] base64String;
+                                    base64String = Base64.decode(productlist.get(position).getImage(), Base64.DEFAULT);
+
+                                    i.putExtra("productimage", base64String);
                                     startActivity(i);
                                 }
                             });

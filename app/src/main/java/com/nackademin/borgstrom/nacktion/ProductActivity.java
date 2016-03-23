@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -76,6 +79,7 @@ public class ProductActivity extends AppCompatActivity
         String time = getIntent().getStringExtra("productsluttid");
         final String pris = getIntent().getStringExtra("produktpris");
 
+
         minBid(auktionId);
         emailSubject = name;
 
@@ -86,18 +90,38 @@ public class ProductActivity extends AppCompatActivity
         tName.setText(name);
         tDescription.setText(description);
         tTime.setText("Sluttid: " + time);
-        tPrice.setText("Acceptpris: " +pris + "kr");
+        tPrice.setText("Acceptpris: " + pris + "kr");
+
 
         try {
+            byte[] image = getIntent().getByteArrayExtra("productimage");
+            if (image.length >10) {
+                Bitmap bitMap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                ImageView iv = (ImageView) findViewById(R.id.productImage);
+                iv.setImageBitmap(bitMap);
+            }
+            else{
+                InputStream imageStream = getAssets().open("noimage.png");
+                Drawable d = Drawable.createFromStream(imageStream, null);
+
+                ImageView iv = (ImageView) findViewById(R.id.productImage);
+                iv.setImageDrawable(d);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+       /* try {
+
             InputStream imageStream = getAssets().open("noimage.png");
             Drawable d = Drawable.createFromStream(imageStream, null);
 
             ImageView iv = (ImageView) findViewById(R.id.productImage);
             iv.setImageDrawable(d);
 
+
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         assert fab != null;
@@ -112,8 +136,8 @@ public class ProductActivity extends AppCompatActivity
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int fullprice = (int) Math.round( Double.parseDouble(pris));
-                placeBid(auktionId,  fullprice);
+                int fullprice = (int) Math.round(Double.parseDouble(pris));
+                placeBid(auktionId, fullprice);
 
             }
         });
@@ -174,11 +198,11 @@ public class ProductActivity extends AppCompatActivity
             Intent sendMail = new Intent(Intent.ACTION_SEND);
             sendMail.setType("text/mail");
             sendMail.putExtra(Intent.EXTRA_EMAIL, new String[]{"borgstrom.simon@gmail.com"});
-            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Gällane Auktion " +emailSubject);
+            sendMail.putExtra(Intent.EXTRA_SUBJECT, "Gällane Auktion " + emailSubject);
             sendMail.putExtra(Intent.EXTRA_TEXT, "Hej Nacktion");
             startActivity(Intent.createChooser(sendMail, "Välj epostprogram:"));
         } else if (id == R.id.nav_send) {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nacktion.azurewebsites.net"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.nauktion.azurewebsites.net"));
             startActivity(browserIntent);
 
         }
@@ -274,7 +298,6 @@ public class ProductActivity extends AppCompatActivity
     }
 
 
-
     private void minBid(int auktion) {
 
         final int auktionId = auktion;
@@ -297,7 +320,7 @@ public class ProductActivity extends AppCompatActivity
                         JSONObject js = response.getJSONObject(i);
                         bids.add(js.getInt("Offer"));
                         if (bids.get(i) > minprice)
-                            minprice = bids.get(i)+1;
+                            minprice = bids.get(i) + 1;
                         Log.d("temp", String.valueOf(js.getInt("Offer")));
                     }
                 } catch (InterruptedException e) {
@@ -311,7 +334,8 @@ public class ProductActivity extends AppCompatActivity
                 }
             }
 
-        }); t.start();
+        });
+        t.start();
 
         /*return minprice;*/
     }

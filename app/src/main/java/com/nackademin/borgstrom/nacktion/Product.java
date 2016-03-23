@@ -9,6 +9,7 @@ public class Product {
     private String description;
     private String acceptpris;
     private String slutTid;
+    private String imagebit;
 
     public Product(int id, String name) {
         this.id = id;
@@ -21,6 +22,15 @@ public class Product {
         this.description = description;
         this.acceptpris = acceptpris;
         this.slutTid = slutTid;
+    }
+
+    public Product(int id, String name, String description, String acceptpris, String slutTid, String imagebit) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.acceptpris = acceptpris;
+        this.slutTid = slutTid;
+        this.imagebit = imagebit;
     }
 
     public int getId() {
@@ -41,6 +51,11 @@ public class Product {
 
     public String getSlutTid() {
         return slutTid;
+    }
+
+
+    public String getImage() {
+        return imagebit;
     }
 
     @Override
